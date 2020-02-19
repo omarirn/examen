@@ -123,6 +123,15 @@
                                 Sueldo Pesos: {{empleado.salarioPesos}}
                             </li>
                             <li class="list-group-item">
+                                Proyeccion a 5 Meses
+                                <ul>
+                                    <li v-for="item in Proyecciones">
+                                        Mes: {{item.mes}}
+                                        Sueldo en Pesos:{{item.sueldoPesos}}
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item">
                                 Direccion: {{empleado.direccion}}
                             </li>
                             <li class="list-group-item">
@@ -156,6 +165,10 @@
         name: "EmpleadoComponent",
         data(){
             return{
+                proyecciones:[{
+                    mes:'',
+                    sueldoPesos:0.0
+                }],
                 tipoCambio:0,
                 lstEmpleadosBK:[],
                 filtro: null,
@@ -310,7 +323,7 @@
                 });
             },
             consultarWebService(){
-                axios.get('https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2020-02-19/2020-02-19', {
+                axios.get('http://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2020-02-19/2020-02-19', {
                     headers: {
                         'Accept':'application/json',
                         'Access-Control-Allow-Origin': '*',
@@ -322,6 +335,12 @@
                     }
                 }).then(function (response) {
                     console.log('response is : ' + response);
+                    this.proyecciones = [
+                        {
+                            mes:'TEST',
+                            sueldoPesos:0.0
+                        }
+                    ];
                 }).catch(function (error) {
                     if (error.response) {
                         console.log(error.response.headers);
