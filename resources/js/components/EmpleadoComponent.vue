@@ -124,15 +124,6 @@
                                 Sueldo Pesos: {{empleado.salarioPesos}}
                             </li>
                             <li class="list-group-item">
-                                Proyeccion a 5 Meses
-                                <ul>
-                                    <li v-for="item in Proyecciones">
-                                        Mes: {{item.mes}}
-                                        Sueldo en Pesos:{{item.sueldoPesos}}
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="list-group-item">
                                 Direccion: {{empleado.direccion}}
                             </li>
                             <li class="list-group-item">
@@ -166,10 +157,6 @@
         name: "EmpleadoComponent",
         data(){
             return{
-                proyecciones:[{
-                    mes:'',
-                    sueldoPesos:0.0
-                }],
                 tipoCambio:0.0,
                 lstEmpleadosBK:[],
                 filtro: null,
@@ -331,7 +318,6 @@
                     dataType : "jsonp", //Se utiliza JSONP para realizar la consulta cross-site
                     success : function(response) {  //Handler de la respuesta
                         var salida = parseFloat(response.bmx.series[0].datos[0].dato);
-                        console.log(salida);
                         $('#valorDato').val(salida)
                         $('#valorDato')[0].dispatchEvent(new Event('change'));
 
