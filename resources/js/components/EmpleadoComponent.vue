@@ -57,8 +57,8 @@
                                 <td>{{(item.activo == true)?'SI':'NO'}}</td>
                                 <td>
                                     <div class="custom-control custom-switch">
-                                        <input type="checkbox" v-model="item.activo" class="custom-control-input" id="customSwitch1" @change="cambiarEstatus(item)">
-                                        <label class="custom-control-label" for="customSwitch1">Activo</label>
+                                        <input type="checkbox" v-model="item.activo" class="custom-control-input" :id="index" @change="cambiarEstatus(item)">
+                                        <label class="custom-control-label" :for="index" >Activo{{item.id}}</label>
                                     </div>
                                     <button class="btn btn-sm btn-info" @click="detalle(item)">O</button>
                                     <button class="btn btn-sm btn-warning" @click="editar(item)">/</button>
@@ -304,8 +304,13 @@
                 this.empleado = item;
                 $('#detalle').modal('show');
             },
+            /**
+             * Cambiar el activo o inactivo
+             * @param item
+             */
             cambiarEstatus(item){
                 const params = item;
+                console.log(item);
                 axios.post('/empleados/activar',params).then((res)=>{
                     this.loader = false;
                     this.mostrarMensaje('Se guardo con Exito', 200);
