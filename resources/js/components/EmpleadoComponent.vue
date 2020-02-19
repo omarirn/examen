@@ -12,22 +12,23 @@
                 <div class="card" v-if="btnEditar">
                     <div class="card-header">Agregar Empleados</div>
                     <div class="card-body" align="center">
-                        <div clas="row">
-                            <form class="form-group" @submit.prevent="guardar">
+                            <form @submit.prevent="guardar">
                                 <input type ="text" v-model="empleado.codigo" placeholder="Codigo" class="form-control" required>
                                 <input type ="text" v-model="empleado.nombre" placeholder="Nombre" class="form-control"required pattern="[^ñ-Ñ]">
-                                <input type ="numer"  min="0" v-model="empleado.salarioDolares" placeholder="Salario dolares" class="form-control"required @change="calcularPesos">
+                                <input type ="number"  min="0" v-model="empleado.salarioDolares" placeholder="Salario dolares" class="form-control"required @change="calcularPesos">
                                 <input type ="number" min="0" v-model="empleado.salarioPesos" placeholder="Salario pesos" class="form-control" readonly>
                                 <input type ="text" v-model="empleado.direccion" placeholder="Direccion" class="form-control"required>
                                 <input type ="text" v-model="empleado.estado" placeholder="Estado" class="form-control"required>
                                 <input type ="text" v-model="empleado.ciudad" placeholder="Ciudad" class="form-control"required>
                                 <input type ="text" v-model="empleado.telefono" placeholder="Telefono" class="form-control"required>
                                 <input type ="email" v-model="empleado.correo" placeholder="Correo" class="form-control"required >
-                                <button class="btn btn-primary btn-group" type="submit">Guardar</button>
-                                <button class="btn btn-danger btn-group" @click="cancelarEdicion">Cancelar</button>
+                                <div class="row" align="center">
+                                    <button class="btn btn-primary btn-group" type="submit">Guardar</button>
+                                    <button class="btn btn-danger btn-group" @click="cancelarEdicion">Cancelar</button>
+                                </div>
                             </form>
+                            <input @change="cambiarValor" hidden id="valorDato" class="form-control" type="text" ref="myTestField">
                         </div>
-                    </div>
                 </div>
                 <div class="card" v-if="!btnEditar">
                     <div class="card-header">
@@ -169,7 +170,7 @@
                     mes:'',
                     sueldoPesos:0.0
                 }],
-                tipoCambio:0,
+                tipoCambio:0.0,
                 lstEmpleadosBK:[],
                 filtro: null,
                 loader:false,
@@ -223,6 +224,7 @@
                     eliminado:false
                 };
                 this.btnEditar = true;
+                this.consultarWebService();
             },
             /**
              * Funcion para guardar los datos
@@ -323,45 +325,29 @@
                 });
             },
             consultarWebService(){
-                axios.get('http://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2020-02-19/2020-02-19', {
-                    headers: {
-                        'Accept':'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                        'Bmx-Token': '0fce7d85c76c9afa6f8ef05f95d50a11c62573c637d28706e28f2a81e84264e5'
-                    },
-                    proxy: {
-                        host: '104.236.174.88',
-                        port: 3128
+                $.ajax({
+                    url : "http://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/2020-02-19/2020-02-19?token=0fce7d85c76c9afa6f8ef05f95d50a11c62573c637d28706e28f2a81e84264e5",
+                    jsonp : "callback",
+                    dataType : "jsonp", //Se utiliza JSONP para realizar la consulta cross-site
+                    success : function(response) {  //Handler de la respuesta
+                        var salida = parseFloat(response.bmx.series[0].datos[0].dato);
+                        console.log(salida);
+                        $('#valorDato').val(salida)
+                        $('#valorDato')[0].dispatchEvent(new Event('change'));
+
                     }
-                }).then(function (response) {
-                    console.log('response is : ' + response);
-                    this.proyecciones = [
-                        {
-                            mes:'TEST',
-                            sueldoPesos:0.0
-                        }
-                    ];
-                }).catch(function (error) {
-                    if (error.response) {
-                        console.log(error.response.headers);
-                    }
-                    else if (error.request) {
-                        console.log(error.request);
-                    }
-                    else {
-                        console.log(error.message);
-                    }
-                    console.log(error.config);
                 });
             },
             calcularPesos(){
-                this.empleado.salarioPesos = this.tipoCambio * this.empleado.salarioDolares;
+                this.empleado.salarioPesos = parseFloat(this.tipoCambio) * parseFloat(this.empleado.salarioDolares);
+            },
+            cambiarValor(){
+                this.tipoCambio = this.$refs.myTestField.value
             }
         },
         created() {
             $('.toast').toast({delay: 3000 });
             this.buscar();
-            this.consultarWebService();
         }
     }
 </script>
